@@ -53,6 +53,7 @@
   .btn.hold.on{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
   .btn:disabled{opacity:.45;cursor:default}
   .btn.start{min-height:52px;padding:0 34px;font-size:17px;margin-top:6px}
+  .btn.flash.on{background:#fff9e6;color:#1b1206}
   details{border-top:1px solid var(--line);padding-top:10px}
   summary{cursor:pointer;color:var(--muted);font-size:14px;min-height:32px;display:flex;align-items:center}
   .sliders{display:grid;gap:6px;margin-top:6px}
@@ -105,7 +106,11 @@
   <div class="actions">
     <button class="btn primary" id="snap" disabled>التقاط صورة</button>
     <button class="btn" id="flip" disabled>قلب الكاميرا</button>
-    <button class="btn hold" id="orig" disabled>أمسك هنا لرؤية الصورة الأصلية</button>
+  </div>
+
+  <div class="actions">
+    <button class="btn flash" id="flash" disabled>🔦 الفلاش</button>
+    <button class="btn hold" id="orig" disabled>أمسك للأصلية</button>
   </div>
 
   <details>
@@ -140,7 +145,7 @@
   const work = document.createElement('canvas');
   const wctx = work.getContext('2d', { willReadFrequently: true });
 
-  const S = { gain: 4, gamma: 0.59, clip: 3, denoise: 0.5, mode: 'color', orig: false, engine: 'retinex' };
+  const S = { gain: 4, gamma: 0.59, clip: 3, denoise: 0.5, mode: 'color', orig: false, engine: 'retinex', flashOn: false };
   const PRESETS = { light: [20, 35, 2, 40], mid: [40, 55, 3, 65], strong: [70, 70, 4, 75] };
   const HINTS = {
     classic: 'CLAHE مع غاما: الأسرع، لكنه يزيد الحبيبات',
@@ -189,7 +194,7 @@
   Object.values(el).forEach(i => i.addEventListener('input', readSliders));
   readSliders(); setEngine('retinex');
 
-  let stream = null, facing = 'environment', running = false;
+  let stream = null, facing = 'environment', running = false, track = null;
 
   async function start() {
     try {
@@ -199,12 +204,38 @@
       });
       video.srcObject = stream;
       await video.play();
+      track = stream.getVideoTracks()[0];
       $('intro').hidden = true;
-      ['snap', 'flip', 'orig'].forEach(i => $(i).disabled = false);
+      ['snap', 'flip', 'orig', 'flash'].forEach(i => $(i).disabled = false);
       running = true;
       loop();
     } catch (e) {
       alert('خطأ في الكاميرا: ' + e.message);
+    }
+  }
+
+  function toggleFlash() {
+    if (!track) return;
+    S.flashOn = !S.flashOn;
+    const flashBtn = $('flash');
+    
+    if (S.flashOn) {
+      flashBtn.classList.add('on');
+      // تفعيل الفلاش
+      track.applyConstraints({
+        advanced: [{ torch: true }]
+      }).catch(err => {
+        console.log('الفلاش غير متاح:', err);
+        S.flashOn = false;
+        flashBtn.classList.remove('on');
+        alert('الفلاش غير متاح على هذا الجهاز');
+      });
+    } else {
+      flashBtn.classList.remove('on');
+      // إيقاف الفلاش
+      track.applyConstraints({
+        advanced: [{ torch: false }]
+      }).catch(err => console.log('خطأ في إيقاف الفلاش:', err));
     }
   }
 
@@ -238,6 +269,7 @@
 
   $('start').addEventListener('click', start);
   $('flip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; start(); });
+  $('flash').addEventListener('click', toggleFlash);
 
   const orig = $('orig');
   orig.addEventListener('pointerdown', () => { S.orig = true; orig.classList.add('on'); });
