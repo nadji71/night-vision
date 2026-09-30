@@ -2,311 +2,44 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>شاهد في الظلام</title>
 <style>
-  :root{
-    --bg:#0b1119;
-    --panel:#131b27;
-    --raise:#1b2636;
-    --line:#26344a;
-    --text:#e9eef5;
-    --muted:#8b9db4;
-    --accent:#ffb454;
-    --accent-bg:#2b2110;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:var(--bg);color:var(--text);
-    font-family:"Noto Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
-    -webkit-tap-highlight-color:transparent}
-  body{display:grid;grid-template-rows:minmax(0,1fr) auto;height:100vh;height:100dvh;overflow:hidden}
-  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .stage{position:relative;overflow:hidden;background:#05080c;min-height:0;display:flex;align-items:center;justify-content:center}
-  #out{width:100%;height:100%;object-fit:cover;display:block}
-  .frame{position:absolute;inset:12px;pointer-events:none}
-  .frame i{position:absolute;width:22px;height:22px;border:0 solid var(--accent);opacity:.9}
-  .frame i:nth-child(1){top:0;left:0;border-top-width:2px;border-left-width:2px}
-  .frame i:nth-child(2){top:0;right:0;border-top-width:2px;border-right-width:2px}
-  .frame i:nth-child(3){bottom:0;left:0;border-bottom-width:2px;border-left-width:2px}
-  .frame i:nth-child(4){bottom:0;right:0;border-bottom-width:2px;border-right-width:2px}
-  .intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:28px 24px;text-align:center;background:#05080c;overflow:auto;z-index:10}
-  .intro > :first-child{margin-top:auto}
-  .intro > :last-child{margin-bottom:auto}
-  .intro h1{font-size:clamp(30px,7vw,52px);font-weight:800;line-height:1.15}
-  .intro p{max-width:34ch;color:var(--muted);font-size:15px;line-height:1.8}
-  .intro .fine{font-size:13px}
-  .intro .msg{color:#ffb4a8;font-size:14px;line-height:1.9;max-width:42ch;text-align:start;white-space:pre-line;background:#1d1417;border:1px solid #4a2a2e;border-radius:10px;padding:12px 14px}
-  .msg:empty{display:none}
-  .intro[hidden]{display:none}
-  .status{position:absolute;inset-inline:16px;bottom:16px;padding:10px 12px;border-radius:10px;background:rgba(11,17,25,.92);border:1px solid var(--line);font-size:13.5px;line-height:1.7;text-align:center;z-index:5}
-  .status[hidden]{display:none}
-  .panel{background:var(--panel);border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));max-height:48vh;max-height:48dvh;overflow:auto;display:grid;gap:12px;align-content:start}
-  .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .seg button{flex:1;min-height:44px;background:transparent;color:var(--muted);border:0;font:inherit;font-size:15px;cursor:pointer}
-  .seg button+button{border-inline-start:1px solid var(--line)}
-  .seg button[aria-pressed="true"]{background:var(--accent-bg);color:var(--accent);font-weight:700}
-  .hint{color:var(--muted);font-size:12.5px;line-height:1.6;margin-top:-6px}
-  .actions{display:grid;grid-template-columns:1.3fr 1fr;gap:8px}
-  .btn{min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--raise);color:var(--text);font:inherit;font-size:15px;cursor:pointer;padding:0 14px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
-  .btn.primary{background:var(--accent);border-color:var(--accent);color:#1b1206;font-weight:700}
-  .btn.hold{grid-column:1/-1;touch-action:none}
-  .btn.hold.on{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
-  .btn:disabled{opacity:.45;cursor:default}
-  .btn.start{min-height:52px;padding:0 34px;font-size:17px;margin-top:6px}
-  .btn.flash.on{background:#fff9e6;color:#1b1206}
-  details{border-top:1px solid var(--line);padding-top:10px}
-  summary{cursor:pointer;color:var(--muted);font-size:14px;min-height:32px;display:flex;align-items:center}
-  .sliders{display:grid;gap:6px;margin-top:6px}
-  .row label{display:flex;justify-content:space-between;font-size:14px;color:var(--text)}
-  .row output{color:var(--accent);font-variant-numeric:tabular-nums}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent}
-  input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--line);border-radius:2px}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);border:0;margin-top:-9px}
-  input[type=range]::-moz-range-track{height:4px;background:var(--line);border-radius:2px}
-  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);border:0}
-  @media (min-width:900px){
-    body{grid-template-rows:none;grid-template-columns:minmax(0,1fr) 370px}
-    .panel{max-height:none;border-top:0;border-inline-start:1px solid var(--line);padding:20px}
-  }
+:root{--bg:#0b1119;--panel:#131b27;--raise:#1b2636;--line:#26344a;--text:#e9eef5;--muted:#8b9db4;--accent:#ffb454;--accent-bg:#2b2110}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:"Noto Sans Arabic","Segoe UI",sans-serif}
+body{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+.stage{position:relative;flex:1 1 auto;min-width:0;min-height:0;overflow:hidden;background:#05080c}
+#out{position:absolute;inset:0;width:100%;height:100%;display:block}
+.frame{position:absolute;inset:12px;pointer-events:none}.frame i{position:absolute;width:22px;height:22px;border:0 solid var(--accent)}
+.frame i:nth-child(1){top:0;left:0;border-top-width:2px;border-left-width:2px}.frame i:nth-child(2){top:0;right:0;border-top-width:2px;border-right-width:2px}.frame i:nth-child(3){bottom:0;left:0;border-bottom-width:2px;border-left-width:2px}.frame i:nth-child(4){bottom:0;right:0;border-bottom-width:2px;border-right-width:2px}
+.intro{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#05080c}.intro[hidden]{display:none}.intro h1{font-size:clamp(30px,7vw,52px)}.intro p{max-width:36ch;color:var(--muted);line-height:1.8}.msg{color:#ffb4a8;white-space:pre-line}.msg:empty{display:none}
+.panel{flex:0 0 auto;z-index:3;background:var(--panel);border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));max-height:48dvh;overflow:auto;display:grid;gap:10px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg button{flex:1;min-height:40px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px}.seg button[aria-pressed=true]{background:var(--accent-bg);color:var(--accent);font-weight:700}.hint{font-size:12px;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--raise);color:var(--text);font:inherit;cursor:pointer}.btn.primary{background:var(--accent);color:#1b1206;font-weight:700}.btn:disabled{opacity:.45}.btn.on{background:#fff9e6;color:#1b1206}.hold{grid-column:1/-1}
+details{border-top:1px solid var(--line);padding-top:8px}summary{color:var(--muted);padding:6px}.sliders{display:grid;gap:5px}.row label{display:flex;justify-content:space-between;font-size:13px}.row output{color:var(--accent)}input[type=range]{width:100%}
+@media (min-width:900px){body{flex-direction:row}.stage{order:1}.panel{order:2;flex:0 0 370px;max-height:none;overflow:auto;border-top:0;border-inline-start:1px solid var(--line);padding:20px}}
 </style>
 </head>
 <body>
-
-<section class="stage" aria-label="معاينة الكاميرا">
-  <canvas id="out"></canvas>
-  <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <p class="status" id="status" role="status" hidden></p>
-
-  <div class="intro" id="intro">
-    <h1>شاهد في الظلام</h1>
-    <p>تُضيء هذه الصفحة الصورة القادمة من كاميرتك لحظة بلحظة. المعالجة تتم على جهازك، ولا يُرسل أي شيء إلى الإنترنت.</p>
-    <button class="btn primary start" id="start">شغّل الكاميرا</button>
-    <p class="msg" id="msg" role="alert"></p>
-  </div>
+<section class="stage"><canvas id="out"></canvas><div class="frame"><i></i><i></i><i></i><i></i></div><div class="intro" id="intro"><h1>شاهد في الظلام</h1><p>المعالجة تتم على جهازك ولا تُرسل الصورة إلى الإنترنت.</p><button class="btn primary" id="start">شغّل الكاميرا</button><p class="msg" id="msg"></p></div></section>
+<section class="panel">
+<div class="seg"><button data-engine="classic">سريعة</button><button data-engine="retinex" aria-pressed="true">Retinex</button></div><p class="hint" id="hint">خريطة إضاءة تلقائية</p>
+<div class="seg"><button data-preset="light">خفيفة</button><button data-preset="mid" aria-pressed="true">متوسطة</button><button data-preset="strong">شديدة</button></div>
+<div class="seg"><button data-mode="color" aria-pressed="true">ألوان طبيعية</button><button data-mode="night">أخضر ليلي</button></div>
+<div class="actions"><button class="btn primary" id="snap" disabled>التقاط صورة</button><button class="btn" id="flip" disabled>قلب الكاميرا</button><button class="btn" id="flash" disabled>🔦 الفلاش</button><button class="btn hold" id="orig" disabled>أمسك للأصلية</button></div>
+<details><summary>ضبط يدوي</summary><div class="sliders"><div class="row"><label>السطوع <output id="og"></output></label><input id="gain" type="range" min="10" max="80" value="40"></div><div class="row"><label>رفع الظلال <output id="os"></output></label><input id="shadow" type="range" min="0" max="100" value="55"></div></div></details>
 </section>
-
-<section class="panel" aria-label="أدوات التحكم">
-  <div class="seg" role="group" aria-label="طريقة المعالجة">
-    <button data-engine="classic" aria-pressed="false">سريعة</button>
-    <button data-engine="retinex" aria-pressed="true">Retinex</button>
-  </div>
-  <p class="hint" id="hint"></p>
-
-  <div class="seg" role="group" aria-label="شدة الإضاءة">
-    <button data-preset="light" aria-pressed="false">خفيفة</button>
-    <button data-preset="mid" aria-pressed="true">متوسطة</button>
-    <button data-preset="strong" aria-pressed="false">شديدة</button>
-  </div>
-
-  <div class="seg" role="group" aria-label="نمط الصورة">
-    <button data-mode="color" aria-pressed="true">ألوان طبيعية</button>
-    <button data-mode="night" aria-pressed="false">أخضر ليلي</button>
-  </div>
-
-  <div class="actions">
-    <button class="btn primary" id="snap" disabled>التقاط صورة</button>
-    <button class="btn" id="flip" disabled>قلب الكاميرا</button>
-  </div>
-
-  <div class="actions">
-    <button class="btn flash" id="flash" disabled>🔦 الفلاش</button>
-    <button class="btn hold" id="orig" disabled>أمسك للأصلية</button>
-  </div>
-
-  <details>
-    <summary>ضبط يدوي</summary>
-    <div class="sliders">
-      <div class="row">
-        <label for="gain">السطوع <output id="o-gain"></output></label>
-        <input type="range" id="gain" min="10" max="80" step="1" value="40">
-      </div>
-      <div class="row">
-        <label for="shadow">رفع الظلال <output id="o-shadow"></output></label>
-        <input type="range" id="shadow" min="0" max="100" step="1" value="55">
-      </div>
-      <div class="row">
-        <label for="clip">وضوح التفاصيل <output id="o-clip"></output></label>
-        <input type="range" id="clip" min="0" max="8" step="0.5" value="3">
-      </div>
-      <div class="row">
-        <label for="dn">تقليل الضجيج <output id="o-dn"></output></label>
-        <input type="range" id="dn" min="0" max="85" step="1" value="65">
-      </div>
-    </div>
-  </details>
-</section>
-
 <script>
-(() => {
-  const $ = id => document.getElementById(id);
-  const out = $('out'), octx = out.getContext('2d', { alpha: false });
-  const video = document.createElement('video');
-  video.setAttribute('playsinline', ''); video.muted = true;
-  const work = document.createElement('canvas');
-  const wctx = work.getContext('2d', { willReadFrequently: true });
-
-  // إعداد الـ canvas ليملأ المساحة الكاملة
-  function resizeCanvas() {
-    const stage = document.querySelector('.stage');
-    const w = stage.clientWidth;
-    const h = stage.clientHeight;
-    out.width = w;
-    out.height = h;
-    work.width = w;
-    work.height = h;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-
-  const S = { gain: 4, gamma: 0.59, clip: 3, denoise: 0.5, mode: 'color', orig: false, engine: 'retinex', flashOn: false };
-  const PRESETS = { light: [20, 35, 2, 40], mid: [40, 55, 3, 65], strong: [70, 70, 4, 75] };
-  const HINTS = {
-    classic: 'CLAHE مع غاما: الأسرع، لكنه يزيد الحبيبات',
-    retinex: 'خريطة إضاءة تلقائية: أنعم وأقرب للطبيعي'
-  };
-  const el = { gain: $('gain'), shadow: $('shadow'), clip: $('clip'), dn: $('dn') };
-  let dirty = true;
-
-  function readSliders() {
-    S.gain = el.gain.value / 10;
-    S.gamma = 1 - el.shadow.value * 0.0075;
-    S.clip = +el.clip.value;
-    S.denoise = el.dn.value / 100;
-    $('o-gain').textContent = S.gain.toFixed(1) + '×';
-    $('o-shadow').textContent = el.shadow.value + '%';
-    $('o-clip').textContent = S.clip === 0 ? 'مُعطّل' : S.clip;
-    $('o-dn').textContent = el.dn.value + '%';
-    dirty = true;
-  }
-
-  function setEngine(name) {
-    S.engine = name;
-    $('hint').textContent = HINTS[name];
-  }
-
-  document.querySelectorAll('[data-engine]').forEach(b => b.addEventListener('click', () => {
-    setEngine(b.dataset.engine);
-    b.closest('.seg').querySelectorAll('button').forEach(btn =>
-      btn.setAttribute('aria-pressed', btn === b ? 'true' : 'false'));
-  }));
-
-  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
-    const v = PRESETS[b.dataset.preset];
-    el.gain.value = v[0]; el.shadow.value = v[1]; el.clip.value = v[2]; el.dn.value = v[3];
-    readSliders();
-    b.closest('.seg').querySelectorAll('button').forEach(btn =>
-      btn.setAttribute('aria-pressed', btn === b ? 'true' : 'false'));
-  }));
-
-  document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
-    S.mode = b.dataset.mode;
-    b.closest('.seg').querySelectorAll('button').forEach(btn =>
-      btn.setAttribute('aria-pressed', btn === b ? 'true' : 'false'));
-  }));
-
-  Object.values(el).forEach(i => i.addEventListener('input', readSliders));
-  readSliders(); setEngine('retinex');
-
-  let stream = null, facing = 'environment', running = false, track = null;
-
-  async function start() {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
-        audio: false
-      });
-      video.srcObject = stream;
-      await video.play();
-      track = stream.getVideoTracks()[0];
-      $('intro').hidden = true;
-      ['snap', 'flip', 'orig', 'flash'].forEach(i => $(i).disabled = false);
-      running = true;
-      loop();
-    } catch (e) {
-      alert('خطأ في الكاميرا: ' + e.message);
-    }
-  }
-
-  function toggleFlash() {
-    if (!track) return;
-    S.flashOn = !S.flashOn;
-    const flashBtn = $('flash');
-    
-    if (S.flashOn) {
-      flashBtn.classList.add('on');
-      track.applyConstraints({
-        advanced: [{ torch: true }]
-      }).catch(err => {
-        console.log('الفلاش غير متاح:', err);
-        S.flashOn = false;
-        flashBtn.classList.remove('on');
-        alert('الفلاش غير متاح على هذا الجهاز');
-      });
-    } else {
-      flashBtn.classList.remove('on');
-      track.applyConstraints({
-        advanced: [{ torch: false }]
-      }).catch(err => console.log('خطأ في إيقاف الفلاش:', err));
-    }
-  }
-
-  function loop() {
-    if (!running) return;
-    requestAnimationFrame(loop);
-    if (video.readyState < 2) return;
-
-    const w = out.width, h = out.height;
-    const vw = video.videoWidth, vh = video.videoHeight;
-    
-    // حساب النسبة للملء الكامل مع الحفاظ على النسب
-    const scale = Math.max(w / vw, h / vh);
-    const sw = w / scale, sh = h / scale;
-    const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
-
-    wctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
-    const img = wctx.getImageData(0, 0, w, h);
-    const data = img.data;
-    
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i], g = data[i + 1], b = data[i + 2];
-      let y = 0.299 * r + 0.587 * g + 0.114 * b;
-      y = Math.pow(y / 255, S.gamma) * 255 * S.gain;
-      y = Math.min(255, y);
-      
-      if (S.mode === 'night') {
-        data[i] = y * 0.22;
-        data[i + 1] = y;
-        data[i + 2] = y * 0.3;
-      } else {
-        data[i] = y;
-        data[i + 1] = y;
-        data[i + 2] = y;
-      }
-    }
-    
-    octx.putImageData(img, 0, 0);
-  }
-
-  $('start').addEventListener('click', start);
-  $('flip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; start(); });
-  $('flash').addEventListener('click', toggleFlash);
-
-  const orig = $('orig');
-  orig.addEventListener('pointerdown', () => { S.orig = true; orig.classList.add('on'); });
-  orig.addEventListener('pointerup', () => { S.orig = false; orig.classList.remove('on'); });
-  orig.addEventListener('pointerleave', () => { S.orig = false; orig.classList.remove('on'); });
-
-  $('snap').addEventListener('click', () => {
-    out.toBlob(b => {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(b);
-      a.download = 'night-' + Date.now() + '.jpg';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }, 'image/jpeg', 0.92);
-  });
+(()=>{
+const $=id=>document.getElementById(id), stage=document.querySelector('.stage'),out=$('out'),ctx=out.getContext('2d',{alpha:false}),work=document.createElement('canvas'),wctx=work.getContext('2d',{willReadFrequently:true}),video=document.createElement('video');video.playsInline=true;video.muted=true;
+let stream=null,track=null,running=false,facing='environment',mode='color',flash=false,original=false,gain=4,gamma=.5875;
+function size(){const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);if(out.width!==w||out.height!==h){out.width=w;out.height=h;work.width=w;work.height=h}}
+new ResizeObserver(size).observe(stage);window.addEventListener('resize',size);size();
+$('gain').oninput=e=>{gain=+e.target.value/10;$('og').textContent=gain.toFixed(1)+'×'};$('shadow').oninput=e=>{gamma=1-e.target.value*.0075;$('os').textContent=e.target.value+'%'};$('gain').oninput({target:$('gain')});$('shadow').oninput({target:$('shadow')});
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});document.querySelectorAll('[data-engine]').forEach(b=>b.onclick=()=>{b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+async function start(){try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:facing},width:{ideal:1920},height:{ideal:1080}},audio:false});video.srcObject=stream;await video.play();track=stream.getVideoTracks()[0];$('intro').hidden=true;['snap','flip','flash','orig'].forEach(id=>$(id).disabled=false);running=true;size();requestAnimationFrame(loop)}catch(e){$('msg').textContent='تعذر تشغيل الكاميرا: '+e.message}}
+function loop(){if(!running)return;requestAnimationFrame(loop);if(video.readyState<2)return;size();const w=out.width,h=out.height,vw=video.videoWidth,vh=video.videoHeight,scale=Math.max(w/vw,h/vh),sw=w/scale,sh=h/scale,sx=(vw-sw)/2,sy=(vh-sh)/2;wctx.drawImage(video,sx,sy,sw,sh,0,0,w,h);const img=wctx.getImageData(0,0,w,h),d=img.data;if(!original)for(let i=0;i<d.length;i+=4){let y=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];y=Math.min(255,Math.pow(y/255,gamma)*255*gain);if(mode==='night'){d[i]=y*.22;d[i+1]=y;d[i+2]=y*.3}else{d[i]=d[i+1]=d[i+2]=y}}ctx.putImageData(img,0,0)}
+$('start').onclick=start;$('flip').onclick=()=>{facing=facing==='user'?'environment':'user';start()};$('flash').onclick=()=>{if(!track)return;flash=!flash;$('flash').classList.toggle('on',flash);track.applyConstraints({advanced:[{torch:flash}]}).catch(()=>{flash=false;$('flash').classList.remove('on');alert('الفلاش غير متاح في هذه الكاميرا')})};$('orig').onpointerdown=()=>{original=true};['pointerup','pointercancel','pointerleave'].forEach(e=>$('orig').addEventListener(e,()=>original=false));$('snap').onclick=()=>out.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='night-'+Date.now()+'.jpg';a.click() },'image/jpeg',.92);
 })();
-</script>
-</body>
-</html>
+</script></body></html>
