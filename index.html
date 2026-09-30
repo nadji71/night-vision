@@ -3,43 +3,169 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>شاهد في الظلام</title>
 <style>
 :root{--bg:#0b1119;--panel:#131b27;--raise:#1b2636;--line:#26344a;--text:#e9eef5;--muted:#8b9db4;--accent:#ffb454;--accent-bg:#2b2110}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:"Noto Sans Arabic","Segoe UI",sans-serif}
-body{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
-.stage{position:relative;flex:1 1 auto;min-width:0;min-height:0;overflow:hidden;background:#05080c}
-#out{position:absolute;inset:0;width:100%;height:100%;display:block}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:"Noto Sans Arabic","Segoe UI",sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column}
+.stage{flex:1;min-width:0;min-height:0;position:relative;background:#05080c;overflow:hidden}
+#out{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
 .frame{position:absolute;inset:12px;pointer-events:none}.frame i{position:absolute;width:22px;height:22px;border:0 solid var(--accent)}
-.frame i:nth-child(1){top:0;left:0;border-top-width:2px;border-left-width:2px}.frame i:nth-child(2){top:0;right:0;border-top-width:2px;border-right-width:2px}.frame i:nth-child(3){bottom:0;left:0;border-bottom-width:2px;border-left-width:2px}.frame i:nth-child(4){bottom:0;right:0;border-bottom-width:2px;border-right-width:2px}
-.intro{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#05080c}.intro[hidden]{display:none}.intro h1{font-size:clamp(30px,7vw,52px)}.intro p{max-width:36ch;color:var(--muted);line-height:1.8}.msg{color:#ffb4a8;white-space:pre-line}.msg:empty{display:none}
-.panel{flex:0 0 auto;z-index:3;background:var(--panel);border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));max-height:48dvh;overflow:auto;display:grid;gap:10px}
-.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg button{flex:1;min-height:40px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px}.seg button[aria-pressed=true]{background:var(--accent-bg);color:var(--accent);font-weight:700}.hint{font-size:12px;color:var(--muted)}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--raise);color:var(--text);font:inherit;cursor:pointer}.btn.primary{background:var(--accent);color:#1b1206;font-weight:700}.btn:disabled{opacity:.45}.btn.on{background:#fff9e6;color:#1b1206}.hold{grid-column:1/-1}
-details{border-top:1px solid var(--line);padding-top:8px}summary{color:var(--muted);padding:6px}.sliders{display:grid;gap:5px}.row label{display:flex;justify-content:space-between;font-size:13px}.row output{color:var(--accent)}input[type=range]{width:100%}
-@media (min-width:900px){body{flex-direction:row}.stage{order:1}.panel{order:2;flex:0 0 370px;max-height:none;overflow:auto;border-top:0;border-inline-start:1px solid var(--line);padding:20px}}
+.frame i:nth-child(1){top:0;left:0;border-top:2px solid var(--accent);border-left:2px solid var(--accent)}
+.frame i:nth-child(2){top:0;right:0;border-top:2px solid var(--accent);border-right:2px solid var(--accent)}
+.frame i:nth-child(3){bottom:0;left:0;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent)}
+.frame i:nth-child(4){bottom:0;right:0;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent)}
+.intro{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#05080c}
+.intro[hidden]{display:none}
+.intro h1{font-size:clamp(28px,7vw,52px);font-weight:800}
+.intro p{max-width:36ch;color:var(--muted);line-height:1.8;font-size:15px}
+.intro .msg{color:#ffb4a8;white-space:pre-line;font-size:14px}
+.intro .msg:empty{display:none}
+.panel{flex:0 0 auto;z-index:5;background:var(--panel);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));max-height:48vh;overflow-y:auto;display:grid;gap:8px;grid-auto-rows:max-content}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{min-height:38px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+.seg button:not(:last-child){border-right:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-bg);color:var(--accent);font-weight:700}
+.hint{font-size:11px;color:var(--muted);margin:-4px 0 4px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn{min-height:40px;border:1px solid var(--line);border-radius:8px;background:var(--raise);color:var(--text);font:inherit;font-size:13px;cursor:pointer;padding:0 10px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1b1206;font-weight:700}
+.btn:disabled{opacity:.4}
+.btn.on{background:#fff9e6;color:#1b1206;border-color:#fff9e6}
+.btn.hold{grid-column:1/-1}
+details{border-top:1px solid var(--line);padding-top:6px}
+summary{color:var(--muted);font-size:12px;cursor:pointer;padding:4px 0}
+.sliders{display:grid;gap:4px}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:12px}
+.row label{color:var(--text)}
+.row output{color:var(--accent)}
+input[type=range]{width:100%;height:22px;-webkit-appearance:none;appearance:none;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:0;margin-top:-7.5px;cursor:pointer}
+input[type=range]::-moz-range-track{height:3px;background:var(--line);border-radius:2px;border:0}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:0;cursor:pointer}
+@media (min-width:900px){
+body{flex-direction:row}
+.stage{order:1}
+.panel{order:2;flex:0 0 360px;max-height:none;border-top:0;border-left:1px solid var(--line);padding:16px}
+}
 </style>
 </head>
 <body>
-<section class="stage"><canvas id="out"></canvas><div class="frame"><i></i><i></i><i></i><i></i></div><div class="intro" id="intro"><h1>شاهد في الظلام</h1><p>المعالجة تتم على جهازك ولا تُرسل الصورة إلى الإنترنت.</p><button class="btn primary" id="start">شغّل الكاميرا</button><p class="msg" id="msg"></p></div></section>
+<section class="stage"><canvas id="out"></canvas><div class="frame"><i></i><i></i><i></i><i></i></div><div class="intro" id="intro"><h1>شاهد في الظلام</h1><p>المعالجة تتم على جهازك بدون إرسال الصور للإنترنت</p><button class="btn primary" id="start" style="min-width:120px">شغّل الكاميرا</button><p class="msg" id="msg"></p></div></section>
 <section class="panel">
-<div class="seg"><button data-engine="classic">سريعة</button><button data-engine="retinex" aria-pressed="true">Retinex</button></div><p class="hint" id="hint">خريطة إضاءة تلقائية</p>
+<div class="seg"><button data-engine="classic">سريعة</button><button data-engine="retinex" aria-pressed="true">Retinex</button></div>
+<p class="hint" id="hint">خريطة إضاءة</p>
 <div class="seg"><button data-preset="light">خفيفة</button><button data-preset="mid" aria-pressed="true">متوسطة</button><button data-preset="strong">شديدة</button></div>
-<div class="seg"><button data-mode="color" aria-pressed="true">ألوان طبيعية</button><button data-mode="night">أخضر ليلي</button></div>
-<div class="actions"><button class="btn primary" id="snap" disabled>التقاط صورة</button><button class="btn" id="flip" disabled>قلب الكاميرا</button><button class="btn" id="flash" disabled>🔦 الفلاش</button><button class="btn hold" id="orig" disabled>أمسك للأصلية</button></div>
-<details><summary>ضبط يدوي</summary><div class="sliders"><div class="row"><label>السطوع <output id="og"></output></label><input id="gain" type="range" min="10" max="80" value="40"></div><div class="row"><label>رفع الظلال <output id="os"></output></label><input id="shadow" type="range" min="0" max="100" value="55"></div></div></details>
+<div class="seg"><button data-mode="color" aria-pressed="true">ألوان</button><button data-mode="night">أخضر</button></div>
+<div class="actions"><button class="btn primary" id="snap" disabled>التقاط</button><button class="btn" id="flip" disabled>قلب</button></div>
+<div class="actions"><button class="btn" id="flash" disabled>🔦 فلاش</button><button class="btn hold" id="orig" disabled>أصلي</button></div>
+<details><summary>الضبط</summary><div class="sliders"><div class="row"><label>السطوع</label><output id="og">4.0×</output></div><input id="gain" type="range" min="10" max="80" value="40"><div class="row"><label>رفع الظلال</label><output id="os">55%</output></div><input id="shadow" type="range" min="0" max="100" value="55"></div></details>
 </section>
 <script>
 (()=>{
-const $=id=>document.getElementById(id), stage=document.querySelector('.stage'),out=$('out'),ctx=out.getContext('2d',{alpha:false}),work=document.createElement('canvas'),wctx=work.getContext('2d',{willReadFrequently:true}),video=document.createElement('video');video.playsInline=true;video.muted=true;
-let stream=null,track=null,running=false,facing='environment',mode='color',flash=false,original=false,gain=4,gamma=.5875;
-function size(){const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);if(out.width!==w||out.height!==h){out.width=w;out.height=h;work.width=w;work.height=h}}
-new ResizeObserver(size).observe(stage);window.addEventListener('resize',size);size();
-$('gain').oninput=e=>{gain=+e.target.value/10;$('og').textContent=gain.toFixed(1)+'×'};$('shadow').oninput=e=>{gamma=1-e.target.value*.0075;$('os').textContent=e.target.value+'%'};$('gain').oninput({target:$('gain')});$('shadow').oninput({target:$('shadow')});
-document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});document.querySelectorAll('[data-engine]').forEach(b=>b.onclick=()=>{b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
-async function start(){try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:facing},width:{ideal:1920},height:{ideal:1080}},audio:false});video.srcObject=stream;await video.play();track=stream.getVideoTracks()[0];$('intro').hidden=true;['snap','flip','flash','orig'].forEach(id=>$(id).disabled=false);running=true;size();requestAnimationFrame(loop)}catch(e){$('msg').textContent='تعذر تشغيل الكاميرا: '+e.message}}
-function loop(){if(!running)return;requestAnimationFrame(loop);if(video.readyState<2)return;size();const w=out.width,h=out.height,vw=video.videoWidth,vh=video.videoHeight,scale=Math.max(w/vw,h/vh),sw=w/scale,sh=h/scale,sx=(vw-sw)/2,sy=(vh-sh)/2;wctx.drawImage(video,sx,sy,sw,sh,0,0,w,h);const img=wctx.getImageData(0,0,w,h),d=img.data;if(!original)for(let i=0;i<d.length;i+=4){let y=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];y=Math.min(255,Math.pow(y/255,gamma)*255*gain);if(mode==='night'){d[i]=y*.22;d[i+1]=y;d[i+2]=y*.3}else{d[i]=d[i+1]=d[i+2]=y}}ctx.putImageData(img,0,0)}
-$('start').onclick=start;$('flip').onclick=()=>{facing=facing==='user'?'environment':'user';start()};$('flash').onclick=()=>{if(!track)return;flash=!flash;$('flash').classList.toggle('on',flash);track.applyConstraints({advanced:[{torch:flash}]}).catch(()=>{flash=false;$('flash').classList.remove('on');alert('الفلاش غير متاح في هذه الكاميرا')})};$('orig').onpointerdown=()=>{original=true};['pointerup','pointercancel','pointerleave'].forEach(e=>$('orig').addEventListener(e,()=>original=false));$('snap').onclick=()=>out.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='night-'+Date.now()+'.jpg';a.click() },'image/jpeg',.92);
+const $=id=>document.getElementById(id);
+const stage=$('stage')||document.querySelector('.stage');
+const out=$('out');
+const ctx=out.getContext('2d',{alpha:false});
+const work=document.createElement('canvas');
+const wctx=work.getContext('2d',{willReadFrequently:true});
+const video=document.createElement('video');
+video.playsInline=true;video.muted=true;
+let stream=null,track=null,running=false,facing='environment',mode='color',flash=false,original=false,gain=4,gamma=0.5875;
+function setSize(){
+const w=Math.max(window.innerWidth||320,320);
+const h=Math.max(window.innerHeight||568,568);
+if(out.width!==w||out.height!==h){
+out.width=w;out.height=h;work.width=w;work.height=h;
+console.log('Canvas resized to '+w+'x'+h);
+}}
+setSize();
+window.addEventListener('resize',setSize);
+window.addEventListener('orientationchange',()=>setTimeout(setSize,100));
+$('gain').oninput=e=>{gain=e.target.value/10;$('og').textContent=gain.toFixed(1)+'×'};
+$('shadow').oninput=e=>{gamma=1-e.target.value*0.0075;$('os').textContent=e.target.value+'%'};
+['classic','retinex'].forEach(e=>document.querySelector('[data-engine="'+e+'"]').onclick=function(){
+const p=this.parentElement;
+p.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===this?'true':'false'));
+});
+['light','mid','strong'].forEach(e=>document.querySelector('[data-preset="'+e+'"]').onclick=function(){
+const preset={light:[20,35,2,40],mid:[40,55,3,65],strong:[70,70,4,75]}[e];
+$('gain').value=preset[0];$('shadow').value=preset[1];
+$('gain').oninput({target:$('gain')});
+$('shadow').oninput({target:$('shadow')});
+this.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===this?'true':'false'));
+});
+['color','night'].forEach(e=>document.querySelector('[data-mode="'+e+'"]').onclick=function(){
+mode=e;
+this.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===this?'true':'false'));
+});
+async function start(){
+try{
+if(stream)stream.getTracks().forEach(t=>t.stop());
+stream=await navigator.mediaDevices.getUserMedia({
+video:{facingMode:{ideal:facing},width:{ideal:1920},height:{ideal:1080}},
+audio:false
+});
+video.srcObject=stream;
+await video.play();
+track=stream.getVideoTracks()[0];
+$('intro').hidden=true;
+['snap','flip','flash','orig'].forEach(id=>$(id).disabled=false);
+running=true;
+setSize();
+loop();
+}catch(e){
+$('msg').textContent='خطأ: '+e.message;
+console.error(e);
+}
+}
+function loop(){
+if(!running)return;
+requestAnimationFrame(loop);
+if(video.readyState<2)return;
+const w=out.width,h=out.height;
+const vw=video.videoWidth,vh=video.videoHeight;
+if(!vw||!vh)return;
+const scale=Math.max(w/vw,h/vh);
+const sw=w/scale,sh=h/scale;
+const sx=(vw-sw)/2,sy=(vh-sh)/2;
+wctx.drawImage(video,sx,sy,sw,sh,0,0,w,h);
+const img=wctx.getImageData(0,0,w,h);
+const d=img.data;
+if(!original){
+for(let i=0;i<d.length;i+=4){
+let y=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+y=Math.min(255,Math.pow(y/255,gamma)*255*gain);
+if(mode==='night'){d[i]=y*0.22;d[i+1]=y;d[i+2]=y*0.3}
+else{d[i]=d[i+1]=d[i+2]=y}
+}
+}
+ctx.putImageData(img,0,0);
+}
+$('start').onclick=start;
+$('flip').onclick=()=>{facing=facing==='user'?'environment':'user';start()};
+$('flash').onclick=()=>{
+if(!track)return;
+flash=!flash;
+$('flash').classList.toggle('on',flash);
+track.applyConstraints({advanced:[{torch:flash}]}).catch(()=>{
+flash=false;$('flash').classList.remove('on');
+alert('الفلاش غير متاح');
+});
+};
+$('orig').onpointerdown=()=>original=true;
+['pointerup','pointercancel','pointerleave'].forEach(e=>$('orig').addEventListener(e,()=>original=false));
+$('snap').onclick=()=>out.toBlob(b=>{
+const a=document.createElement('a');
+a.href=URL.createObjectURL(b);
+a.download='night-'+Date.now()+'.jpg';
+a.click();
+},'image/jpeg',0.92);
+console.log('App initialized');
 })();
 </script></body></html>
