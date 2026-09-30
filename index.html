@@ -21,15 +21,15 @@
     -webkit-tap-highlight-color:transparent}
   body{display:grid;grid-template-rows:minmax(0,1fr) auto;height:100vh;height:100dvh;overflow:hidden}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .stage{position:relative;overflow:hidden;background:#05080c;min-height:0}
-  #out{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+  .stage{position:relative;overflow:hidden;background:#05080c;min-height:0;display:flex;align-items:center;justify-content:center}
+  #out{width:100%;height:100%;object-fit:cover;display:block}
   .frame{position:absolute;inset:12px;pointer-events:none}
   .frame i{position:absolute;width:22px;height:22px;border:0 solid var(--accent);opacity:.9}
   .frame i:nth-child(1){top:0;left:0;border-top-width:2px;border-left-width:2px}
   .frame i:nth-child(2){top:0;right:0;border-top-width:2px;border-right-width:2px}
   .frame i:nth-child(3){bottom:0;left:0;border-bottom-width:2px;border-left-width:2px}
   .frame i:nth-child(4){bottom:0;right:0;border-bottom-width:2px;border-right-width:2px}
-  .intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:28px 24px;text-align:center;background:#05080c;overflow:auto}
+  .intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:28px 24px;text-align:center;background:#05080c;overflow:auto;z-index:10}
   .intro > :first-child{margin-top:auto}
   .intro > :last-child{margin-bottom:auto}
   .intro h1{font-size:clamp(30px,7vw,52px);font-weight:800;line-height:1.15}
@@ -38,7 +38,7 @@
   .intro .msg{color:#ffb4a8;font-size:14px;line-height:1.9;max-width:42ch;text-align:start;white-space:pre-line;background:#1d1417;border:1px solid #4a2a2e;border-radius:10px;padding:12px 14px}
   .msg:empty{display:none}
   .intro[hidden]{display:none}
-  .status{position:absolute;inset-inline:16px;bottom:16px;padding:10px 12px;border-radius:10px;background:rgba(11,17,25,.92);border:1px solid var(--line);font-size:13.5px;line-height:1.7;text-align:center}
+  .status{position:absolute;inset-inline:16px;bottom:16px;padding:10px 12px;border-radius:10px;background:rgba(11,17,25,.92);border:1px solid var(--line);font-size:13.5px;line-height:1.7;text-align:center;z-index:5}
   .status[hidden]{display:none}
   .panel{background:var(--panel);border-top:1px solid var(--line);padding:12px 14px calc(12px + env(safe-area-inset-bottom));max-height:48vh;max-height:48dvh;overflow:auto;display:grid;gap:12px;align-content:start}
   .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -73,7 +73,7 @@
 <body>
 
 <section class="stage" aria-label="معاينة الكاميرا">
-  <canvas id="out" width="640" height="480"></canvas>
+  <canvas id="out"></canvas>
   <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <p class="status" id="status" role="status" hidden></p>
 
@@ -139,11 +139,24 @@
 <script>
 (() => {
   const $ = id => document.getElementById(id);
-  const out = $('out'), octx = out.getContext('2d');
+  const out = $('out'), octx = out.getContext('2d', { alpha: false });
   const video = document.createElement('video');
   video.setAttribute('playsinline', ''); video.muted = true;
   const work = document.createElement('canvas');
   const wctx = work.getContext('2d', { willReadFrequently: true });
+
+  // إعداد الـ canvas ليملأ المساحة الكاملة
+  function resizeCanvas() {
+    const stage = document.querySelector('.stage');
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    out.width = w;
+    out.height = h;
+    work.width = w;
+    work.height = h;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 
   const S = { gain: 4, gamma: 0.59, clip: 3, denoise: 0.5, mode: 'color', orig: false, engine: 'retinex', flashOn: false };
   const PRESETS = { light: [20, 35, 2, 40], mid: [40, 55, 3, 65], strong: [70, 70, 4, 75] };
@@ -199,7 +212,7 @@
   async function start() {
     try {
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 15, max: 30 } },
+        video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
         audio: false
       });
       video.srcObject = stream;
@@ -221,7 +234,6 @@
     
     if (S.flashOn) {
       flashBtn.classList.add('on');
-      // تفعيل الفلاش
       track.applyConstraints({
         advanced: [{ torch: true }]
       }).catch(err => {
@@ -232,7 +244,6 @@
       });
     } else {
       flashBtn.classList.remove('on');
-      // إيقاف الفلاش
       track.applyConstraints({
         advanced: [{ torch: false }]
       }).catch(err => console.log('خطأ في إيقاف الفلاش:', err));
@@ -243,8 +254,17 @@
     if (!running) return;
     requestAnimationFrame(loop);
     if (video.readyState < 2) return;
-    wctx.drawImage(video, 0, 0, 640, 480);
-    const img = wctx.getImageData(0, 0, 640, 480);
+
+    const w = out.width, h = out.height;
+    const vw = video.videoWidth, vh = video.videoHeight;
+    
+    // حساب النسبة للملء الكامل مع الحفاظ على النسب
+    const scale = Math.max(w / vw, h / vh);
+    const sw = w / scale, sh = h / scale;
+    const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
+
+    wctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+    const img = wctx.getImageData(0, 0, w, h);
     const data = img.data;
     
     for (let i = 0; i < data.length; i += 4) {
